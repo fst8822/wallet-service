@@ -1,11 +1,49 @@
 package controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import domain.Wallet;
+import dto.mapper.WalletBalanceResponse;
+import dto.mapper.WalletOperationRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import service.WalletService;
+import java.util.UUID;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(name = "api/v1/")
 public class WalletController {
 
+    private final WalletService walletService;
 
+    @PostMapping
+    public ResponseEntity<Void> processOperation(
+            @RequestBody WalletOperationRequest request
+    ) {
+        log.info("Post request wallet ={} operation", request);
+        walletService.processOperation(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{WALLET_UUID}}")
+    public ResponseEntity<WalletBalanceResponse> getWalletBalance(
+            @PathVariable("WALLET_UUID") UUID id
+    ) {
+        Wallet wallet = walletService.findById(id);
+        WalletBalanceResponse response = toDto(wallet);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(response);
+    }
+
+    private WalletBalanceResponse toDto(Wallet wallet) {
+        return new WalletBalanceResponse(
+                wallet.id(),
+                wallet.balance(),
+                wallet.createdAt()
+        );
+    }
 }
