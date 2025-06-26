@@ -38,7 +38,7 @@ public class WalletService {
         }
         if (request.operation()== OperationType.WITHDRAW) {
             if (foundWallet.balance().compareTo(request.amount()) < 0) {
-                throw new IllegalArgumentException("Insufficient balance=% for withdrawal with id=%"
+                throw new IllegalArgumentException("Insufficient balance=%s for withdrawal with id=%s"
                         .formatted(request.amount(), request.id()));
             }
             newBalance = foundWallet.balance().subtract(request.amount());
