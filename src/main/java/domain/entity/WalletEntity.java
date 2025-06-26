@@ -22,13 +22,13 @@ public class WalletEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
-    OperationType operation;
+    private OperationType operation;
 
-    @Column(name = "amount")
-    BigDecimal amount;
+    @Column(name = "balance")
+    private BigDecimal balance;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
