@@ -26,31 +26,36 @@ public class WalletService {
         Wallet foundWallet = findById(request.id());
 
         BigDecimal newBalance;
-        if (request.operation()== OperationType.DEPOSIT) {
+        if (request.operation() == OperationType.DEPOSIT) {
             newBalance = foundWallet.balance().add(request.amount());
             Wallet newWallet = foundWallet.withBalance(newBalance);
 
-            WalletEntity EntityToSave = walletMapper.domainToEntity(newWallet);
-            repository.save(EntityToSave);
+            WalletEntity entityToSave = walletMapper.domainToEntity(newWallet);
+            repository.save(entityToSave);
             return;
         }
         if (request.operation()== OperationType.WITHDRAW) {
-            if (foundWallet.balance().compareTo(request.amount()) < 0) {
-                throw new IllegalArgumentException("Insufficient balance=%s for withdrawal with id=%s"
-                        .formatted(foundWallet.balance(), foundWallet.id()));
-            }
+            validateSufficientBalance(foundWallet, request.amount());
+
             newBalance = foundWallet.balance().subtract(request.amount());
             Wallet newWallet = foundWallet.withBalance(newBalance);
 
-            WalletEntity EntityToSave = walletMapper.domainToEntity(newWallet);
-            repository.save(EntityToSave);
+            WalletEntity entityToSave = walletMapper.domainToEntity(newWallet);
+            repository.save(entityToSave);
         }
     }
 
     public Wallet findById(UUID id) {
         return  repository.findById(id)
                 .map(walletMapper::entityToDomain)
-                .orElseThrow(() -> new EntityNotFoundException("wallet not found with id=%s"
-                        .formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("wallet not found with id=%s".formatted(id)));
+    }
+
+    private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
+        if (wallet.balance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException(
+                    "Insufficient balance=%s for withdrawal, wallet id=%s"
+                            .formatted(wallet.balance(), wallet.id()));
+        }
     }
 }
