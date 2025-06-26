@@ -6,11 +6,9 @@ import domain.entity.WalletEntity;
 import dto.mapper.WalletOperationRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import repository.WalletRepository;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
