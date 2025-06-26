@@ -3,6 +3,7 @@ package service;
 import domain.OperationType;
 import domain.Wallet;
 import domain.entity.WalletEntity;
+import dto.mapper.WalletMapper;
 import dto.mapper.WalletOperationRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class WalletService {
 
     private final WalletRepository repository;
+    private final WalletMapper walletMapper;
 
 
     @Transactional
@@ -26,55 +28,29 @@ public class WalletService {
         BigDecimal newBalance;
         if (request.operation()== OperationType.DEPOSIT) {
             newBalance = foundWallet.balance().add(request.amount());
-            Wallet newWallet = new Wallet(
-                    foundWallet.id(),
-                    foundWallet.operation(),
-                    newBalance,
-                    foundWallet.createdAt()
-            );
-            WalletEntity EntityToSave = domainToEntity(newWallet);
+            Wallet newWallet = foundWallet.withBalance(newBalance);
+
+            WalletEntity EntityToSave = walletMapper.domainToEntity(newWallet);
             repository.save(EntityToSave);
             return;
         }
         if (request.operation()== OperationType.WITHDRAW) {
             if (foundWallet.balance().compareTo(request.amount()) < 0) {
                 throw new IllegalArgumentException("Insufficient balance=%s for withdrawal with id=%s"
-                        .formatted(request.amount(), request.id()));
+                        .formatted(foundWallet.balance(), foundWallet.id()));
             }
             newBalance = foundWallet.balance().subtract(request.amount());
-            Wallet newWallet = new Wallet(
-                    foundWallet.id(),
-                    foundWallet.operation(),
-                    newBalance,
-                    foundWallet.createdAt()
-            );
-            WalletEntity EntityToSave = domainToEntity(newWallet);
+            Wallet newWallet = foundWallet.withBalance(newBalance);
+
+            WalletEntity EntityToSave = walletMapper.domainToEntity(newWallet);
             repository.save(EntityToSave);
         }
     }
 
-
     public Wallet findById(UUID id) {
         return  repository.findById(id)
-                .map(this::entityToDomain)
+                .map(walletMapper::entityToDomain)
                 .orElseThrow(() -> new EntityNotFoundException("wallet not found with id=%s"
                         .formatted(id)));
-    }
-
-    private Wallet entityToDomain(WalletEntity entity) {
-        return new Wallet(
-                entity.getId(),
-                entity.getOperation(),
-                entity.getBalance(),
-                entity.getCreatedAt()
-        );
-    }
-
-    private WalletEntity domainToEntity(Wallet wallet) {
-        return new WalletEntity(
-                wallet.id(),
-                wallet.operation(),
-                wallet.balance(),
-                wallet.createdAt());
     }
 }
