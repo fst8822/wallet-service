@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface WalletRepository extends JpaRepository<UUID, WalletEntity> {
+public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
 
     @Query("select we from WalletEntity we where we.id =:id")
     Optional<WalletEntity> findById(@Param("id") UUID id);
