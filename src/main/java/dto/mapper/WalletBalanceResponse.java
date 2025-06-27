@@ -7,7 +7,6 @@ import java.util.UUID;
 public record WalletBalanceResponse(
 
         UUID id,
-        BigDecimal balance,
-        LocalDateTime createdAt
+        BigDecimal balance
 ) {
 }

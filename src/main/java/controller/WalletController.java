@@ -32,6 +32,7 @@ public class WalletController {
     public ResponseEntity<WalletBalanceResponse> getWalletBalance(
             @PathVariable("WALLET_UUID") UUID id
     ) {
+        log.info("Get request wallet id={} operation", id);
         Wallet wallet = walletService.findById(id);
         WalletBalanceResponse response = toDto(wallet);
         return ResponseEntity
@@ -40,10 +41,10 @@ public class WalletController {
     }
 
     private WalletBalanceResponse toDto(Wallet wallet) {
+        log.info("Call method toDto wallet ={} ", wallet);
         return new WalletBalanceResponse(
                 wallet.id(),
-                wallet.balance(),
-                wallet.createdAt()
+                wallet.balance()
         );
     }
 }

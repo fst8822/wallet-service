@@ -2,25 +2,26 @@ package dto.mapper;
 
 import domain.Wallet;
 import domain.entity.WalletEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class WalletMapper {
 
     public Wallet entityToDomain(WalletEntity entity) {
+        log.info("Call method entityToDomain with entity={} ", entity);
         return new Wallet(
                 entity.getId(),
-                entity.getOperation(),
-                entity.getBalance(),
-                entity.getCreatedAt()
+                entity.getBalance()
         );
     }
 
     public WalletEntity domainToEntity(Wallet wallet) {
+        log.info("Call method domainToEntity with wallet={} ", wallet);
         return new WalletEntity(
                 wallet.id(),
-                wallet.operation(),
-                wallet.balance(),
-                wallet.createdAt());
+                wallet.balance()
+        );
     }
 }
