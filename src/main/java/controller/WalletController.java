@@ -1,8 +1,8 @@
 package controller;
 
 import domain.Wallet;
-import dto.mapper.WalletBalanceResponse;
-import dto.mapper.WalletOperationRequest;
+import dto.WalletBalanceResponse;
+import dto.WalletOperationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
