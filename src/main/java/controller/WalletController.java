@@ -3,6 +3,7 @@ package controller;
 import domain.Wallet;
 import dto.mapper.WalletBalanceResponse;
 import dto.mapper.WalletOperationRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class WalletController {
 
     @PostMapping
     public ResponseEntity<Void> processOperation(
-            @RequestBody WalletOperationRequest request
+            @Valid @RequestBody WalletOperationRequest request
     ) {
         log.info("Post request wallet ={} operation", request);
         walletService.processOperation(request);
