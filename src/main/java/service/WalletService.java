@@ -2,8 +2,8 @@ package service;
 
 import domain.OperationType;
 import domain.Wallet;
-import domain.entity.WalletEntity;
-import dto.mapper.WalletMapper;
+import entity.WalletEntity;
+import mapper.WalletMapper;
 import dto.mapper.WalletOperationRequest;
 import exception.InsufficientFundsException;
 import exception.InvalidOperationTypeException;
