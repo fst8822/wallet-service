@@ -6,6 +6,7 @@ import domain.entity.WalletEntity;
 import dto.mapper.WalletMapper;
 import dto.mapper.WalletOperationRequest;
 import exception.InsufficientFundsException;
+import exception.InvalidOperationTypeException;
 import exception.WalletNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,29 +28,23 @@ public class WalletService {
     @Transactional
     public void processOperation(WalletOperationRequest request) {
         log.info("Call method processOperation with request={} ", request);
-        validatePositiveAmount(request.amount());
         Wallet foundWallet = findById(request.id());
 
         if (request.operation() == OperationType.DEPOSIT) {
             log.info("Begin operation type with DEPOSIT");
-            Wallet newWallet = deposit(foundWallet, request.amount());
-
-            WalletEntity entityToSave = walletMapper.domainToEntity(newWallet);
-            log.info("Begin operation save entity={} in DEPOSIT method", entityToSave);
-            repository.save(entityToSave);
-            log.info("End operation save entity with DEPOSIT");
-            return;
-        }
-        if (request.operation()== OperationType.WITHDRAW) {
+            foundWallet = deposit(foundWallet, request.amount());
+        } else if (request.operation()== OperationType.WITHDRAW) {
             log.info("Begin operation type with WITHDRAW");
-            validateSufficientBalance(foundWallet, request.amount());
-
-            Wallet newWallet = withdraw(foundWallet, request.amount());
-            WalletEntity entityToSave = walletMapper.domainToEntity(newWallet);
-            log.info("Begin operation save entity={} in WITHDRAW method", entityToSave);
-            repository.save(entityToSave);
-            log.info("End operation save entity with WITHDRAW");
+            foundWallet = withdraw(foundWallet, request.amount());
+        } else {
+            log.error("Throw InvalidOperationTypeException={}", request.operation());
+            throw new InvalidOperationTypeException("Invalid operation type");
         }
+        WalletEntity entityToSave = walletMapper.domainToEntity(foundWallet);
+
+        log.info("Begin operation save entity={}", entityToSave);
+        repository.save(entityToSave);
+        log.info("End operation save entity");
     }
 
     @Transactional(readOnly = true)
@@ -62,12 +57,17 @@ public class WalletService {
 
     private Wallet deposit(Wallet walletToDeposit, BigDecimal amount) {
         log.info("Call method deposit with wallet={} and amount={}", walletToDeposit, amount);
-        return walletToDeposit.deposit(amount);
+        validatePositiveAmount(amount);
+        BigDecimal newAmount = walletToDeposit.balance().add(amount);
+        return walletToDeposit.getNewWalletWithNewBalance(newAmount);
     }
 
     private Wallet withdraw(Wallet walletToWithdraw, BigDecimal amount) {
+        validateSufficientBalance(walletToWithdraw, amount);
+        validatePositiveAmount(amount);
         log.info("Call method withdraw with wallet={} and amount={}", walletToWithdraw, amount);
-        return walletToWithdraw.withdraw(amount);
+        BigDecimal newAmount = walletToWithdraw.balance().subtract(amount);
+        return walletToWithdraw.getNewWalletWithNewBalance(newAmount);
     }
 
     private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
