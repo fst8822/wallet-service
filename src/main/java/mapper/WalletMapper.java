@@ -1,7 +1,7 @@
-package dto.mapper;
+package mapper;
 
 import domain.Wallet;
-import domain.entity.WalletEntity;
+import entity.WalletEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
