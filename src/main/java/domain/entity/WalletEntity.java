@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "wallets")
@@ -22,4 +21,13 @@ public class WalletEntity {
 
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    public WalletEntity(UUID id, BigDecimal balance) {
+        this.id = id;
+        this.balance = balance;
+    }
 }
