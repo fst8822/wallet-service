@@ -8,8 +8,6 @@ import org.das.wallet.mapper.WalletMapper;
 import org.das.wallet.exception.InsufficientFundsException;
 import org.das.wallet.exception.InvalidOperationTypeException;
 import org.das.wallet.exception.WalletNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ public class WalletService {
         this.repository = repository;
         this.walletMapper = walletMapper;
     }
-
 
     @Transactional
     public void processOperation(WalletOperationRequest request) {
@@ -55,10 +52,10 @@ public class WalletService {
         log.info("End operation save entity");
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Wallet findById(UUID id) {
         log.info("Call method findById with id={}", id);
-        return  repository.findById(id)
+        return  repository.findByIdWithLock(id)
                 .map(walletMapper::entityToDomain)
                 .orElseThrow(() -> new WalletNotFoundException("wallet not found with id=%s".formatted(id)));
     }
