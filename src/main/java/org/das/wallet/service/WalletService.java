@@ -5,7 +5,6 @@ import org.das.wallet.domain.Wallet;
 import org.das.wallet.dto.WalletOperationRequest;
 import org.das.wallet.entity.WalletEntity;
 import org.das.wallet.mapper.WalletMapper;
-import org.das.wallet.exception.InsufficientFundsException;
 import org.das.wallet.exception.InvalidOperationTypeException;
 import org.das.wallet.exception.WalletNotFoundException;
 import org.das.wallet.utils.WalletValidation;
