@@ -8,6 +8,7 @@ import org.das.wallet.mapper.WalletMapper;
 import org.das.wallet.exception.InsufficientFundsException;
 import org.das.wallet.exception.InvalidOperationTypeException;
 import org.das.wallet.exception.WalletNotFoundException;
+import org.das.wallet.utils.WalletValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,17 @@ import java.util.UUID;
 public class WalletService {
 
     private static final Logger log = LoggerFactory.getLogger(WalletService.class);
+    private final WalletValidation walletValidation;
     private final WalletRepository repository;
     private final WalletMapper walletMapper;
 
     @Autowired
-    public WalletService(WalletRepository repository, WalletMapper walletMapper) {
+    public WalletService(
+            WalletValidation walletValidation,
+            WalletRepository repository,
+            WalletMapper walletMapper
+    ) {
+        this.walletValidation = walletValidation;
         this.repository = repository;
         this.walletMapper = walletMapper;
     }
@@ -62,34 +69,18 @@ public class WalletService {
 
     private Wallet deposit(Wallet walletToDeposit, BigDecimal amount) {
         log.info("Call method deposit with wallet={} and amount={}", walletToDeposit, amount);
-        validatePositiveAmount(amount);
+        walletValidation.validatePositiveAmount(amount);
         BigDecimal newAmount = walletToDeposit.balance().add(amount);
         return walletToDeposit.getNewWalletWithNewBalance(newAmount);
     }
 
     private Wallet withdraw(Wallet walletToWithdraw, BigDecimal amount) {
-        validateSufficientBalance(walletToWithdraw, amount);
-        validatePositiveAmount(amount);
+        walletValidation.validateSufficientBalance(walletToWithdraw, amount);
+        walletValidation.validatePositiveAmount(amount);
         log.info("Call method withdraw with wallet={} and amount={}", walletToWithdraw, amount);
         BigDecimal newAmount = walletToWithdraw.balance().subtract(amount);
         return walletToWithdraw.getNewWalletWithNewBalance(newAmount);
     }
 
-    private void validateSufficientBalance(Wallet wallet, BigDecimal amount) {
-        log.info("Call method validateSufficientBalance with wallet={} and amount={}", wallet, amount);
-        if (wallet.balance().compareTo(amount) < 0) {
-            log.error("Throw InsufficientFundsException balance is Insufficient");
-            throw new InsufficientFundsException(
-                    "Insufficient balance=%s for withdrawal, wallet id=%s"
-                            .formatted(wallet.balance(), wallet.id()));
-        }
-    }
 
-    private void validatePositiveAmount(BigDecimal amount) {
-        log.info("Call method validatePositiveAmount with amount={}", amount);
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            log.error("Throw IllegalArgumentException because Amount is negative");
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-    }
 }
