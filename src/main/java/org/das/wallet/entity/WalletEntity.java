@@ -1,11 +1,10 @@
 package org.das.wallet.entity;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@NoArgsConstructor
+
 @Entity
 @Table(name = "wallets")
 public class WalletEntity {
@@ -24,6 +23,9 @@ public class WalletEntity {
     public WalletEntity(UUID id, BigDecimal balance) {
         this.id = id;
         this.balance = balance;
+    }
+
+    public WalletEntity() {
     }
 
     public UUID getId() {
