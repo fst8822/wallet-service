@@ -1,5 +1,6 @@
 package org.das.wallet.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.das.wallet.controller.WalletController;
@@ -12,7 +13,12 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -79,6 +85,35 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorMessageResponse> handleValidationExceptions(MethodArgumentTypeMismatchException ex) {
+        log.error("Handle MethodArgumentTypeMismatchException={}", ex.getMessage());
+        ErrorMessageResponse errorResponse = new ErrorMessageResponse(
+                "VALIDATION_QUERY_ARGUMENT",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> NoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
+        log.error("Handle NoResourceFoundException={}", ex.getMessage());
+        Map<String, Object> description = new LinkedHashMap<>();
+        description.put("timestamp", LocalDateTime.now());
+        description.put("path", request.getRequestURI());
+        description.put("status", HttpStatus.NOT_FOUND);
+        description.put("error", "Not Found");
+        description.put("message", ex.getMessage());
+
+        ErrorMessageResponse errorResponse = new ErrorMessageResponse(
+                "VALIDATION_NoResource_Error",
+                description.toString(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(BindException.class)
