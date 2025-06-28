@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.das.wallet.service.WalletService;
+import org.das.wallet.service.WalletServiceImpl;
 import java.util.UUID;
 
 @RestController
@@ -18,11 +18,11 @@ import java.util.UUID;
 public class WalletController {
 
     private static final Logger log = LoggerFactory.getLogger(WalletController.class);
-    private final WalletService walletService;
+    private final WalletServiceImpl walletServiceImpl;
 
     @Autowired
-    public WalletController(WalletService walletService) {
-        this.walletService = walletService;
+    public WalletController(WalletServiceImpl walletServiceImpl) {
+        this.walletServiceImpl = walletServiceImpl;
     }
 
     @PostMapping
@@ -30,7 +30,7 @@ public class WalletController {
             @Valid @RequestBody WalletOperationRequest request
     ) {
         log.info("Post request wallet ={} operation", request);
-        walletService.processOperation(request);
+        walletServiceImpl.processOperation(request);
         return ResponseEntity.ok().build();
     }
 
@@ -38,7 +38,7 @@ public class WalletController {
     public ResponseEntity<WalletBalanceResponse> getWalletBalance(
             @PathVariable("WALLET_UUID") UUID id
     ) {
-        Wallet wallet = walletService.findById(id);
+        Wallet wallet = walletServiceImpl.findById(id);
         WalletBalanceResponse response = toDto(wallet);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
