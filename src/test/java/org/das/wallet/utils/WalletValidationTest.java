@@ -38,7 +38,7 @@ class WalletValidationTest {
     @Test
     void validateSufficientBalance_NullWallet_ThrowsException() {
         BigDecimal withdrawAmount = new BigDecimal("100.00");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> walletValidation.validateSufficientBalance(null, withdrawAmount));
     }
 
@@ -64,7 +64,7 @@ class WalletValidationTest {
 
     @Test
     void validate_NullAmount_ThrowsException() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> walletValidation.validatePositiveAmount(null));
     }
 }
