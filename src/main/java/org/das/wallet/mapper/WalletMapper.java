@@ -13,6 +13,10 @@ public class WalletMapper {
 
     public Wallet entityToDomain(WalletEntity entity) {
         log.info("Call method entityToDomain with entity={} ", entity);
+        if (entity == null) {
+            log.error("Throw IllegalArgumentException Wallet={} not be null", entity);
+            throw new IllegalArgumentException("Wallet not be null");
+        }
         return new Wallet(
                 entity.getId(),
                 entity.getBalance()
@@ -21,6 +25,10 @@ public class WalletMapper {
 
     public WalletEntity domainToEntity(Wallet wallet) {
         log.info("Call method domainToEntity with wallet={} ", wallet);
+        if (wallet == null) {
+            log.error("Throw IllegalArgumentException Wallet={} not be null", wallet);
+            throw new IllegalArgumentException("Wallet not be null");
+        }
         return new WalletEntity(
                 wallet.id(),
                 wallet.balance()
