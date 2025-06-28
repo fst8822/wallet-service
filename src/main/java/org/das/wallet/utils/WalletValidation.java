@@ -1,6 +1,5 @@
 package org.das.wallet.utils;
 
-import jakarta.persistence.Column;
 import org.das.wallet.domain.Wallet;
 import org.das.wallet.exception.InsufficientFundsException;
 import org.slf4j.Logger;
