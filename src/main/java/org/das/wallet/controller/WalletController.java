@@ -39,7 +39,6 @@ public class WalletController {
     public ResponseEntity<WalletBalanceResponse> getWalletBalance(
             @PathVariable("WALLET_UUID") UUID id
     ) {
-        log.info("Get request wallet id={} operation", id);
         Wallet wallet = walletService.findById(id);
         WalletBalanceResponse response = toDto(wallet);
         return ResponseEntity
