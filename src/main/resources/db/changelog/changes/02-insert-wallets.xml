@@ -7,13 +7,13 @@
     <changeSet id="2" author="AdamD">
         <insert tableName="wallets">
             <column name="id" value="f31d64fe-2c85-47bb-a007-9b44f36a5c7c"/>
-            <column name="balance" valueNumeric="1000.00"/>
+            <column name="balance" valueNumeric="2000.00"/>
             <column name="version" valueNumeric="0"/>
         </insert>
 
         <insert tableName="wallets">
             <column name="id" value="9e07b2d2-799b-4b1e-8920-35f64d570cbe"/>
-            <column name="balance" valueNumeric="500.50"/>
+            <column name="balance" valueNumeric="2500.50"/>
             <column name="version" valueNumeric="0"/>
         </insert>
     </changeSet>
