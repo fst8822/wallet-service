@@ -1,85 +1,12 @@
 package org.das.wallet.service;
 
-import org.das.wallet.domain.OperationType;
 import org.das.wallet.domain.Wallet;
 import org.das.wallet.dto.WalletOperationRequest;
-import org.das.wallet.entity.WalletEntity;
-import org.das.wallet.mapper.WalletMapper;
-import org.das.wallet.exception.InvalidOperationTypeException;
-import org.das.wallet.exception.WalletNotFoundException;
-import org.das.wallet.utils.WalletValidation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.das.wallet.repository.WalletRepository;
-import java.math.BigDecimal;
+
 import java.util.UUID;
 
-@Service
-public class WalletService {
+public interface WalletService {
 
-    private static final Logger log = LoggerFactory.getLogger(WalletService.class);
-    private final WalletValidation walletValidation;
-    private final WalletRepository repository;
-    private final WalletMapper walletMapper;
-
-    @Autowired
-    public WalletService(
-            WalletValidation walletValidation,
-            WalletRepository repository,
-            WalletMapper walletMapper
-    ) {
-        this.walletValidation = walletValidation;
-        this.repository = repository;
-        this.walletMapper = walletMapper;
-    }
-
-    @Transactional
-    public void processOperation(WalletOperationRequest request) {
-        log.info("Call method processOperation with request={} ", request);
-        Wallet foundWallet = findById(request.id());
-
-        if (request.operation() == OperationType.DEPOSIT) {
-            log.info("Begin operation type with DEPOSIT");
-            foundWallet = deposit(foundWallet, request.amount());
-        } else if (request.operation()== OperationType.WITHDRAW) {
-            log.info("Begin operation type with WITHDRAW");
-            foundWallet = withdraw(foundWallet, request.amount());
-        } else {
-            log.error("Throw InvalidOperationTypeException={}", request.operation());
-            throw new InvalidOperationTypeException("Invalid operation type");
-        }
-        WalletEntity entityToSave = walletMapper.domainToEntity(foundWallet);
-
-        log.info("Begin operation save entity={}", entityToSave);
-        repository.save(entityToSave);
-        log.info("End operation save entity");
-    }
-
-    @Transactional
-    public Wallet findById(UUID id) {
-        log.info("Call method findById with id={}", id);
-        return  repository.findByIdWithLock(id)
-                .map(walletMapper::entityToDomain)
-                .orElseThrow(() -> new WalletNotFoundException("wallet not found with id=%s".formatted(id)));
-    }
-
-    private Wallet deposit(Wallet walletToDeposit, BigDecimal amount) {
-        log.info("Call method deposit with wallet={} and amount={}", walletToDeposit, amount);
-        walletValidation.validatePositiveAmount(amount);
-        BigDecimal newAmount = walletToDeposit.balance().add(amount);
-        return walletToDeposit.getNewWalletWithNewBalance(newAmount);
-    }
-
-    private Wallet withdraw(Wallet walletToWithdraw, BigDecimal amount) {
-        walletValidation.validateSufficientBalance(walletToWithdraw, amount);
-        walletValidation.validatePositiveAmount(amount);
-        log.info("Call method withdraw with wallet={} and amount={}", walletToWithdraw, amount);
-        BigDecimal newAmount = walletToWithdraw.balance().subtract(amount);
-        return walletToWithdraw.getNewWalletWithNewBalance(newAmount);
-    }
-
-
+    void processOperation(WalletOperationRequest request);
+    Wallet findById(UUID id);
 }
