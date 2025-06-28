@@ -1,13 +1,15 @@
-package mapper;
+package org.das.wallet.mapper;
 
-import domain.Wallet;
-import entity.WalletEntity;
-import lombok.extern.slf4j.Slf4j;
+import org.das.wallet.domain.Wallet;
+import org.das.wallet.entity.WalletEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class WalletMapper {
+
+    private static final Logger log = LoggerFactory.getLogger(WalletMapper.class);
 
     public Wallet entityToDomain(WalletEntity entity) {
         log.info("Call method entityToDomain with entity={} ", entity);

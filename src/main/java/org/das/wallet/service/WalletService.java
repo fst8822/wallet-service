@@ -1,28 +1,36 @@
-package service;
+package org.das.wallet.service;
 
-import domain.OperationType;
-import domain.Wallet;
-import dto.WalletOperationRequest;
-import entity.WalletEntity;
-import mapper.WalletMapper;
-import exception.InsufficientFundsException;
-import exception.InvalidOperationTypeException;
-import exception.WalletNotFoundException;
+import org.das.wallet.domain.OperationType;
+import org.das.wallet.domain.Wallet;
+import org.das.wallet.dto.WalletOperationRequest;
+import org.das.wallet.entity.WalletEntity;
+import org.das.wallet.mapper.WalletMapper;
+import org.das.wallet.exception.InsufficientFundsException;
+import org.das.wallet.exception.InvalidOperationTypeException;
+import org.das.wallet.exception.WalletNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import repository.WalletRepository;
+import org.das.wallet.repository.WalletRepository;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class WalletService {
 
+    private static final Logger log = LoggerFactory.getLogger(WalletService.class);
     private final WalletRepository repository;
     private final WalletMapper walletMapper;
+
+    @Autowired
+    public WalletService(WalletRepository repository, WalletMapper walletMapper) {
+        this.repository = repository;
+        this.walletMapper = walletMapper;
+    }
 
 
     @Transactional

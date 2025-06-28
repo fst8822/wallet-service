@@ -1,6 +1,6 @@
-package repository;
+package org.das.wallet.repository;
 
-import entity.WalletEntity;
+import org.das.wallet.entity.WalletEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

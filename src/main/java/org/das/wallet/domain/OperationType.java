@@ -1,4 +1,4 @@
-package domain;
+package org.das.wallet.domain;
 
 public enum OperationType {
     DEPOSIT,

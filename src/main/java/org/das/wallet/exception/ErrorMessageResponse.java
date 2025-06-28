@@ -1,4 +1,4 @@
-package exception;
+package org.das.wallet.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

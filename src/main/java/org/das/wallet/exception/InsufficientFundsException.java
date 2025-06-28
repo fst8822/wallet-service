@@ -1,4 +1,4 @@
-package exception;
+package org.das.wallet.exception;
 
 public class InsufficientFundsException extends RuntimeException {
 
