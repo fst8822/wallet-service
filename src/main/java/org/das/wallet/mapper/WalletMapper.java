@@ -1,7 +1,7 @@
 package org.das.wallet.mapper;
 
 import org.das.wallet.domain.Wallet;
-import org.das.wallet.dto.WalletBalanceResponse;
+import org.das.wallet.dto.WalletResponse;
 import org.das.wallet.entity.WalletEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +36,13 @@ public class WalletMapper {
         );
     }
 
-    public WalletBalanceResponse toDto(Wallet wallet) {
+    public WalletResponse toDto(Wallet wallet) {
         log.info("Call method toDto wallet ={} ", wallet);
         if (wallet == null) {
             log.error("Throw IllegalArgumentException Wallet not be null");
             throw new IllegalArgumentException("Wallet not be null");
         }
-        return new WalletBalanceResponse(
+        return new WalletResponse(
                 wallet.id(),
                 wallet.balance()
         );

@@ -1,14 +1,13 @@
 package org.das.wallet.controller;
 
 import org.das.wallet.domain.Wallet;
-import org.das.wallet.dto.WalletBalanceResponse;
-import org.das.wallet.dto.WalletOperationRequest;
+import org.das.wallet.dto.WalletResponse;
+import org.das.wallet.dto.WalletUpdateRequest;
 import jakarta.validation.Valid;
 import org.das.wallet.mapper.WalletMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.das.wallet.service.WalletServiceImpl;
@@ -32,21 +31,19 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity<WalletBalanceResponse> processOperation(
-            @Valid @RequestBody WalletOperationRequest request
+    public ResponseEntity<WalletResponse> processOperation(
+            @Valid @RequestBody WalletUpdateRequest request
     ) {
         log.info("Post request wallet ={} operation", request);
-        Wallet wallet = walletServiceImpl.processOperation(request);
+        Wallet wallet = walletServiceImpl.updateWalletBalance(request);
         return ResponseEntity.ok().body(walletMapper.toDto(wallet));
     }
 
     @GetMapping("/{WALLET_UUID}")
-    public ResponseEntity<WalletBalanceResponse> getWalletBalance(
+    public ResponseEntity<WalletResponse> getWallet(
             @PathVariable("WALLET_UUID") UUID id
     ) {
         Wallet wallet = walletServiceImpl.findById(id);
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .body(walletMapper.toDto(wallet));
+        return ResponseEntity.ok(walletMapper.toDto(wallet));
     }
 }

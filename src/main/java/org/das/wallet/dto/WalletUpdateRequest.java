@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record WalletOperationRequest(
+public record WalletUpdateRequest(
         @NotNull(message = "Wallet ID cannot be null")
         UUID id,
 
@@ -15,7 +15,7 @@ public record WalletOperationRequest(
         OperationType operation,
 
         @NotNull(message = "Amount cannot be null")
-        @DecimalMin(value = "1", message = "Amount must > 0")
+        @DecimalMin(value = "1", message = "Amount must be> 0")
         @Digits(integer = 19, fraction = 2, message = "Amount must be digits")
         BigDecimal amount
 ) {
