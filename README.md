@@ -142,9 +142,9 @@ services:
   
   postgres:
     environment:
-      - POSTGRES_DB=wallet_prod
-      - POSTGRES_USER=wallet_user
-      - POSTGRES_PASSWORD=secure_password
+      - POSTGRES_DB=wallet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
 ```
 
 ## База данных
