@@ -2,6 +2,7 @@ package org.das.wallet.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -15,10 +16,6 @@ public class WalletEntity {
 
     @Column(name = "balance", nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
 
     public WalletEntity(UUID id, BigDecimal balance) {
         this.id = id;
@@ -44,11 +41,18 @@ public class WalletEntity {
         this.balance = balance;
     }
 
-    public Long getVersion() {
-        return version;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WalletEntity entity = (WalletEntity) o;
+        return Objects.equals(id, entity.id) && Objects.equals(balance, entity.balance);
     }
 
-    public void setVersion(Long version) {
-        this.version = version;
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(id);
+        result = 31 * result + Objects.hashCode(balance);
+        return result;
     }
 }
