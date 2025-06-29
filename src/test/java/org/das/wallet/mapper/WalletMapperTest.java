@@ -1,6 +1,7 @@
 package org.das.wallet.mapper;
 
 import org.das.wallet.domain.Wallet;
+import org.das.wallet.dto.WalletBalanceResponse;
 import org.das.wallet.entity.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class WalletMapperTest {
 
 
     @Test
-    void shouldConvertEntityToDomainGetDomain() {
+    void shouldConvertEntityToDomainReturnDomain() {
         WalletEntity entity = new WalletEntity(walletId, balance);
         Wallet domain = walletMapper.entityToDomain(entity);
         assertNotNull(domain);
@@ -34,12 +35,26 @@ class WalletMapperTest {
     }
 
     @Test
-    void shouldConvertDomainToEntityGetEntity() {
+    void shouldConvertDomainToEntityReturnEntity() {
         Wallet domain = new Wallet(walletId, balance);
         WalletEntity entity = walletMapper.domainToEntity(domain);
         assertNotNull(domain);
         assertEquals(domain.id(), entity.getId());
         assertEquals(domain.balance(), entity.getBalance());
+    }
+
+    @Test
+    void shouldConvertDomainToDtoReturnDto() {
+        Wallet domain = new Wallet(walletId, balance);
+        WalletBalanceResponse dto = walletMapper.toDto(domain);
+        assertNotNull(dto);
+        assertEquals(domain.id(), dto.id());
+        assertEquals(domain.balance(), dto.balance());
+    }
+
+    @Test
+    void shouldWalletNullWhenToDto_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> walletMapper.toDto(null));
     }
 
     @Test
