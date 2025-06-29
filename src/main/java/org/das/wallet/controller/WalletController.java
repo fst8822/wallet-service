@@ -14,7 +14,7 @@ import org.das.wallet.service.WalletServiceImpl;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/")
+@RequestMapping("api/v1/wallet")
 public class WalletController {
 
     private static final Logger log = LoggerFactory.getLogger(WalletController.class);
@@ -26,12 +26,12 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> processOperation(
+    public ResponseEntity<WalletBalanceResponse> processOperation(
             @Valid @RequestBody WalletOperationRequest request
     ) {
         log.info("Post request wallet ={} operation", request);
-        walletServiceImpl.processOperation(request);
-        return ResponseEntity.ok().build();
+        Wallet wallet = walletServiceImpl.processOperation(request);
+        return ResponseEntity.ok().body(toDto(wallet));
     }
 
     @GetMapping("/{WALLET_UUID}")
@@ -39,14 +39,17 @@ public class WalletController {
             @PathVariable("WALLET_UUID") UUID id
     ) {
         Wallet wallet = walletServiceImpl.findById(id);
-        WalletBalanceResponse response = toDto(wallet);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .body(response);
+                .body(toDto(wallet));
     }
 
     private WalletBalanceResponse toDto(Wallet wallet) {
         log.info("Call method toDto wallet ={} ", wallet);
+        if (wallet == null) {
+            log.error("Throw IllegalArgumentException Wallet not be null");
+            throw new IllegalArgumentException("Wallet not be null");
+        }
         return new WalletBalanceResponse(
                 wallet.id(),
                 wallet.balance()
