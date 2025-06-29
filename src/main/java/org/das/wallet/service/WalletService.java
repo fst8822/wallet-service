@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface WalletService {
 
-    void processOperation(WalletOperationRequest request);
+    Wallet processOperation(WalletOperationRequest request);
     Wallet findById(UUID id);
 }
