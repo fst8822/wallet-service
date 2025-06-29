@@ -1,94 +1,82 @@
 package org.das.wallet.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.das.wallet.TestcontainersConf;
 import org.das.wallet.domain.OperationType;
-import org.das.wallet.domain.Wallet;
-import org.das.wallet.dto.WalletBalanceResponse;
-import org.das.wallet.dto.WalletOperationRequest;
-import org.das.wallet.exception.InvalidOperationTypeException;
-import org.das.wallet.exception.WalletNotFoundException;
-import org.das.wallet.mapper.WalletMapper;
-import org.das.wallet.service.WalletServiceImpl;
+import org.das.wallet.dto.WalletUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.TestcontainersConfiguration;
 import java.math.BigDecimal;
 import java.util.UUID;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(WalletController.class)
+
+@SpringBootTest(classes = TestcontainersConf.class)
+@AutoConfigureMockMvc
+@Import(JacksonAutoConfiguration.class)
 class WalletControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private WalletServiceImpl walletService;
-
-    @MockBean
-    private WalletMapper walletMapper;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    private UUID walletId;
-    private Wallet wallet;
-    private WalletBalanceResponse response;
 
     @BeforeEach
     void setUp() {
-         walletId = UUID.randomUUID();
-         wallet = new Wallet(walletId, new BigDecimal("1500.00"));
-         response = new WalletBalanceResponse(wallet.id(), wallet.balance());
     }
 
     @Test
     void shouldSuccessDepositProcessOperationReturnOK() throws Exception {
-        WalletOperationRequest request = new WalletOperationRequest(
-                walletId, OperationType.DEPOSIT, wallet.balance()
+        UUID walletId = UUID.fromString("f31d64fe-2c85-47bb-a007-9b44f36a5c7c");
+        WalletUpdateRequest request = new WalletUpdateRequest(
+                walletId, OperationType.DEPOSIT, new BigDecimal(1000)
         );
-        when(walletService.processOperation(request)).thenReturn(wallet);
-        when(walletMapper.toDto(wallet)).thenReturn(response);
-
         mockMvc.perform(post("/api/v1/wallet")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(wallet.id().toString()))
-                .andExpect(jsonPath("$.balance").value("1500.0"));
+                .andExpect(jsonPath("$.id").value(request.id().toString()))
+                .andExpect(jsonPath("$.balance").value("3000.0"));
     }
 
     @Test
     void shouldSuccessWithdrawProcessOperationReturnOK() throws Exception {
-        WalletOperationRequest request = new WalletOperationRequest(
-                wallet.id(), OperationType.WITHDRAW, wallet.balance()
+        UUID walletId = UUID.fromString("9e07b2d2-799b-4b1e-8920-35f64d570cbe");
+        WalletUpdateRequest request = new WalletUpdateRequest(
+                walletId, OperationType.WITHDRAW, new BigDecimal(1000)
         );
-        when(walletService.processOperation(request)).thenReturn(wallet);
-        when(walletMapper.toDto(wallet)).thenReturn(response);
         mockMvc.perform(post("/api/v1/wallet")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(wallet.id().toString()))
+                .andExpect(jsonPath("$.id").value(walletId.toString()))
                 .andExpect(jsonPath("$.balance").value("1500.0"));
     }
 
     @Test
     void shouldNotSuccessWhenInvalidOperationTypeProcessOperation_ReturnBAD_REQUEST() throws Exception {
-        WalletOperationRequest request = new WalletOperationRequest(
-                wallet.id(), OperationType.UNKNOWN, wallet.balance()
+        UUID walletId = UUID.fromString("9e07b2d2-799b-4b1e-8920-35f64d570cbe");
+        WalletUpdateRequest request = new WalletUpdateRequest(
+                walletId, OperationType.UNKNOWN, new BigDecimal(1000)
         );
-        when(walletService.processOperation(request))
-                .thenThrow(new InvalidOperationTypeException("Invalid operation type"));
-        when(walletMapper.toDto(wallet)).thenReturn(response);
         mockMvc.perform(post("/api/v1/wallet")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -97,19 +85,16 @@ class WalletControllerTest {
 
     @Test
     void shouldGetWalletBalanceWhenWalletPresent() throws Exception {
-        when(walletService.findById(walletId)).thenReturn(wallet);
-        when(walletMapper.toDto(wallet)).thenReturn(response);
+        UUID walletId = UUID.fromString("7e07b2d2-799b-4b1e-8920-35f64d570cbd");
         mockMvc.perform(get("/api/v1/wallet/{walletId}", walletId))
-                .andExpect(status().isFound())
-                .andExpect(jsonPath("$.id").value(wallet.id().toString()))
-                .andExpect(jsonPath("$.balance").value("1500.0"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(walletId.toString()))
+                .andExpect(jsonPath("$.balance").value("3000.0"));
     }
 
     @Test
     void shouldNotGetWalletBalanceWhenWalletNotPresentReturnNotFound() throws Exception {
-        when(walletService.findById(walletId))
-                .thenThrow(new WalletNotFoundException("wallet not found with id=%s".formatted(walletId)));
-        when(walletMapper.toDto(wallet)).thenReturn(response);
+        UUID walletId = UUID.fromString("4e07b2d2-799b-4b1e-8920-35f64d570cbd");
         mockMvc.perform(get("/api/v1/wallet/{walletId}", walletId))
                 .andExpect(status().isNotFound());
     }

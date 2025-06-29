@@ -1,7 +1,7 @@
 package org.das.wallet.mapper;
 
 import org.das.wallet.domain.Wallet;
-import org.das.wallet.dto.WalletBalanceResponse;
+import org.das.wallet.dto.WalletResponse;
 import org.das.wallet.entity.WalletEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class WalletMapperTest {
     @Test
     void shouldConvertDomainToDtoReturnDto() {
         Wallet domain = new Wallet(walletId, balance);
-        WalletBalanceResponse dto = walletMapper.toDto(domain);
+        WalletResponse dto = walletMapper.toDto(domain);
         assertNotNull(dto);
         assertEquals(domain.id(), dto.id());
         assertEquals(domain.balance(), dto.balance());
