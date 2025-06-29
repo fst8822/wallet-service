@@ -15,8 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class WalletServiceImplTest {
 
@@ -41,6 +39,7 @@ class WalletServiceImplTest {
         walletId = UUID.randomUUID();
         walletEntity = new WalletEntity(walletId, new BigDecimal("1000.00"));
         wallet = new Wallet(walletId, new BigDecimal("1000.00"));
+
     }
 
 
