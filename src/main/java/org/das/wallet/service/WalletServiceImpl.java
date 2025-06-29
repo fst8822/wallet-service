@@ -38,7 +38,7 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     @Transactional
-    public void processOperation(WalletOperationRequest request) {
+    public Wallet processOperation(WalletOperationRequest request) {
         log.info("Call method processOperation with request={} ", request);
         Wallet foundWallet = findById(request.id());
 
@@ -57,6 +57,7 @@ public class WalletServiceImpl implements WalletService{
         log.info("Begin operation save entity={}", entityToSave);
         repository.save(entityToSave);
         log.info("End operation save entity");
+        return foundWallet;
     }
 
     @Override
